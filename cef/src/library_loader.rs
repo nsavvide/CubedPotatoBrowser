@@ -18,7 +18,13 @@ impl LibraryLoader {
             .join(resolver)
             .join(Self::FRAMEWORK_PATH)
             .canonicalize()
-            .unwrap();
+            .unwrap_or_else(|err| {
+                panic!(
+                    "Failed to resolve framework path '{}': {}",
+                    path.join(resolver).join(Self::FRAMEWORK_PATH).display(),
+                    err
+                );
+            });
 
         Self { path }
     }
