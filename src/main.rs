@@ -43,7 +43,7 @@ fn main() {
 
     run_message_loop();
 
-    let window = window.lock().unwrap();
+    let window = window.lock().expect("Failed to lock window");
     let window = window.as_ref().expect("Window is None");
     assert!(window.has_one_ref());
 
