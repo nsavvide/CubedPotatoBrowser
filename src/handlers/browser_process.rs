@@ -54,7 +54,7 @@ impl ImplBrowserProcessHandler for PBrowserProcessHandler {
 
     // The real lifespan of cef starts from `on_context_initialized`, so all the cef objects should be manipulated after that.
     fn on_context_initialized(&self) {
-        println!("cef context intiialized");
+        println!("cef context initialized");
         let mut client = PClient::new();
         let url = CefString::from("https://www.google.com");
 
