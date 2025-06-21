@@ -1,7 +1,8 @@
+use crate::browser::client::PClient;
 use crate::browser::keybinds::{KeybindingManager, VimAction};
 use crate::utils::string::string_utf16_to_utf8;
 use cef::rc::{Rc, RcImpl};
-use cef::{Browser, ImplBrowser, KeyEventType};
+use cef::{Browser, BrowserSettings, Client, ImplBrowser, ImplBrowserHost, KeyEventType, WindowInfo};
 use cef::{CefString, ImplFrame};
 use cef::{ImplKeyboardHandler, WrapKeyboardHandler};
 use cef_dll_sys::_XEvent;
@@ -75,6 +76,19 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                                 let url = frame.url();
                                 println!("Current URL: {}", string_utf16_to_utf8(&url));
                             }
+                        }
+                    }
+                    VimAction::OpenDevTools => {
+                        println!("Opening DevTools");
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            let host = browser.host().unwrap();
+
+                            let window_info = None::<&WindowInfo>;
+                            let dummy_client = None::<&mut PClient>;
+                            let browser_settings = BrowserSettings::default();
+                            let settings = Some(&browser_settings);
+
+                            host.show_dev_tools(window_info, dummy_client, settings, None);
                         }
                     }
                     VimAction::GoToBottom => {
