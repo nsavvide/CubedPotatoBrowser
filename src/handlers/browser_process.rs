@@ -1,19 +1,19 @@
-use crate::browser::client::PClient;
-use crate::browser::window::create_main_window;
-use crate::Window;
+// use crate::browser::client::PClient;
+// use crate::browser::window::create_main_window;
+use cef::Window;
 use cef::{rc::*, *};
 use std::sync::{Arc, Mutex};
 
 pub struct PBrowserProcessHandler {
     pub object: *mut RcImpl<cef_dll_sys::cef_browser_process_handler_t, Self>,
-    pub window: Arc<Mutex<Option<Window>>>,
+    pub windows: Arc<Mutex<Vec<Window>>>,
 }
 
 impl PBrowserProcessHandler {
-    pub fn new(window: Arc<Mutex<Option<Window>>>) -> BrowserProcessHandler {
+    pub fn new(windows: Arc<Mutex<Vec<Window>>>) -> BrowserProcessHandler {
         BrowserProcessHandler::new(Self {
             object: std::ptr::null_mut(),
-            window,
+            windows,
         })
     }
 }
@@ -38,12 +38,12 @@ impl Clone for PBrowserProcessHandler {
         let object = unsafe {
             let rc_impl = &mut *self.object;
             rc_impl.interface.add_ref();
-            rc_impl
+            self.object
         };
 
-        let window = self.window.clone();
+        let windows = self.windows.clone();
 
-        Self { object, window }
+        Self { object, windows }
     }
 }
 
@@ -52,33 +52,36 @@ impl ImplBrowserProcessHandler for PBrowserProcessHandler {
         self.object.cast()
     }
 
-    // The real lifespan of cef starts from `on_context_initialized`, so all the cef objects should be manipulated after that.
     fn on_context_initialized(&self) {
         println!("cef context initialized");
 
-        let browser = Arc::new(Mutex::new(None));
-        let mut client = PClient::new(browser.clone());
+        // let browser = Arc::new(Mutex::new(None));
+        // let mut client = PClient::new(browser.clone());
 
-        let url = CefString::from("https://www.google.com");
+        // let url = CefString::from("https://www.google.com");
 
-        let browser_view = browser_view_create(
-            Some(&mut client),
-            Some(&url),
-            Some(&Default::default()),
-            Option::<&mut DictionaryValue>::None,
-            Option::<&mut RequestContext>::None,
-            Option::<&mut BrowserViewDelegate>::None,
-        )
-        .expect("Failed to create browser view");
+        // let browser_view = browser_view_create(
+        //     Some(&mut client),
+        //     Some(&url),
+        //     Some(&Default::default()),
+        //     None::<&mut cef::DictionaryValue>,
+        //     None::<&mut cef::RequestContext>,
+        //     None::<&mut cef::BrowserViewDelegate>,
+        // )
+        // .expect("Failed to create browser view");
 
-        // Save the browser instance for the keybinding handler
-        if let Some(view_browser) = browser_view.browser() {
-            *browser.lock().unwrap() = Some(view_browser);
-            println!("Browser instance saved in Arc");
-        }
+        // if let Some(view_browser) = browser_view.browser() {
+        //     *browser.lock().unwrap() = Some(view_browser);
+        //     println!("Browser instance saved in Arc");
+        // }
 
-        if let Ok(mut window) = self.window.lock() {
-            *window = create_main_window(browser_view);
-        }
+        // Create and store the new window
+        // if let Ok(mut windows) = self.windows.lock() {
+        //     if let Some(window) = create_main_window(browser_view) {
+        //         windows.push(window);
+        //     } else {
+        //         eprintln!("[BrowserProcessHandler] Failed to create main window");
+        //     }
+        // }
     }
 }
