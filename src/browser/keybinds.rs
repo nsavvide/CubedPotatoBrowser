@@ -16,6 +16,7 @@ pub enum VimAction {
     LeaveInsertMode,
     GoToPrevious,
     GoToNext,
+    OpenDevTools
 }
 
 pub struct KeybindingManager {

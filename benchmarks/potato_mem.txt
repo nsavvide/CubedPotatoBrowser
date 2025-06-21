@@ -1,0 +1,22 @@
+  PID User     Command                         Swap      USS      PSS      RSS 
+1352066 1000     /home/niels/Desktop/side_pr        0    37892    74426   205124 
+1352423 1000     /home/niels/Desktop/side_pr        0    47120    57011   179396 
+1352624 1000     /home/niels/Desktop/side_pr        0    44724    54431   175920 
+1352838 1000     /home/niels/Desktop/side_pr        0    44720    54326   175580 
+1353013 1000     /home/niels/Desktop/side_pr        0    44184    53850   175220 
+1352571 1000     /home/niels/Desktop/side_pr        0    44116    53803   175404 
+1352725 1000     /home/niels/Desktop/side_pr        0    44156    53795   175192 
+1352972 1000     /home/niels/Desktop/side_pr        0    43476    53149   174444 
+1352797 1000     /home/niels/Desktop/side_pr        0    43456    53085   174376 
+1353095 1000     /home/niels/Desktop/side_pr        0    43016    52494   172732 
+1353187 1000     /home/niels/Desktop/side_pr        0    42952    52413   172592 
+1352563 1000     /home/niels/Desktop/side_pr        0    15640    22480   117408 
+1353208 1000     python /usr/bin/smem -r -n         0    13900    15071    20748 
+1352039 1000     /home/niels/Desktop/side_pr        0      692    14923    76140 
+443172 1000     /home/niels/Desktop/side_pr        0    13584    14036    25936 
+1353195 1000     /home/niels/Desktop/side_pr        0     5552     9935    79188 
+1352040 1000     /home/niels/Desktop/side_pr        0      140     7188    76304 
+1352069 1000     /home/niels/Desktop/side_pr        0     2804     7164    58724 
+1352042 1000     /home/niels/Desktop/side_pr        0      216     2058    29176 
+1352404 1000     /bin/bash ./benchmarks/benc        0      340      477     5528 
+1353209 1000     tee potato_mem.txt                 0      168      189     3784 

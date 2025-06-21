@@ -50,7 +50,6 @@ impl ImplLifeSpanHandler for PLifeSpanHandler {
     }
 
     fn on_after_created(&self, browser: Option<&mut Browser>) {
-        println!("on_after_created called");
         if let Some(browser) = browser {
             let b = Browser::clone(browser);
             let mut lock = match self.browser.lock() {
