@@ -8,7 +8,7 @@ use std::{
 use cef::sys;
 use cef::{
     api_hash, args::Args, execute_process, initialize, run_message_loop, shutdown, CefString,
-    ImplCommandLine, Settings, Window,
+    ImplCommandLine, Window,
 };
 use potato_browser::{browser::launch::spawn_browser_window, handlers::app::PApp, sandbox};
 
@@ -65,8 +65,7 @@ fn main() {
     let sandbox = sandbox::create_sandbox();
     let is_browser_process = cmd.has_switch(Some(&CefString::from("type"))) != 1;
 
-    let mut settings = cef::Settings::default();
-    settings.remote_debugging_port = 2012;
+    let settings = cef::Settings { remote_debugging_port: 2012, ..Default::default() };
 
     let windows: Arc<Mutex<Vec<Window>>> = Arc::new(Mutex::new(vec![]));
     let mut app = PApp::new(windows.clone());
