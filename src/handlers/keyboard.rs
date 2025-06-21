@@ -1,8 +1,8 @@
 use crate::browser::keybinds::{KeybindingManager, VimAction};
 use crate::utils::string::string_utf16_to_utf8;
 use cef::rc::{Rc, RcImpl};
-use cef::{CefString, ImplFrame};
 use cef::{Browser, ImplBrowser, KeyEventType};
+use cef::{CefString, ImplFrame};
 use cef::{ImplKeyboardHandler, WrapKeyboardHandler};
 use cef_dll_sys::_XEvent;
 use cef_dll_sys::cef_key_event_type_t;
@@ -82,13 +82,21 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                     VimAction::GoToBottom => {
                         println!("Scrolling to bottom");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
-                            // Todo
-                            println!("q");
                             if let Some(frame) = browser.main_frame() {
                                 // Scroll to the bottom by executing JS on the main frame:
                                 let js_code = CefString::from(
                                     "window.scrollTo(0, document.body.scrollHeight);",
                                 );
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+                    VimAction::GoToTop => {
+                        println!("Scrolling to top");
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                // Scroll to the top by executing JS on the main frame:
+                                let js_code = CefString::from("window.scrollTo(0, 0);");
                                 frame.execute_java_script(Some(&js_code), None, 0);
                             }
                         }

@@ -53,7 +53,13 @@ impl ImplLifeSpanHandler for PLifeSpanHandler {
         println!("on_after_created called");
         if let Some(browser) = browser {
             let b = Browser::clone(browser);
-            let mut lock = self.browser.lock().unwrap();
+            let mut lock = match self.browser.lock() {
+                Ok(guard) => guard,
+                Err(poisoned) => {
+                    eprintln!("Mutex lock poisoned, recovering...");
+                    poisoned.into_inner()
+                }
+            };
             *lock = Some(b);
             println!("Browser instance saved in Arc (on_after_created)");
         }

@@ -7,13 +7,16 @@ use std::sync::Mutex;
 pub struct PClient {
     object: *mut RcImpl<cef_dll_sys::_cef_client_t, Self>,
     pub browser: Arc<Mutex<Option<Browser>>>,
+    pub keyboard_handler: KeyboardHandler,
 }
 
 impl PClient {
     pub fn new(browser: Arc<Mutex<Option<Browser>>>) -> Client {
+        let keyboard_handler = KeyboardHandler::new(PKeyboardHandler::new(browser.clone()));
         Client::new(Self {
             object: std::ptr::null_mut(),
             browser,
+            keyboard_handler,
         })
     }
 }
@@ -34,6 +37,7 @@ impl Clone for PClient {
         Self {
             object: self.object,
             browser: self.browser.clone(),
+            keyboard_handler: self.keyboard_handler.clone(),
         }
     }
 }
@@ -53,9 +57,7 @@ impl ImplClient for PClient {
     }
 
     fn keyboard_handler(&self) -> Option<KeyboardHandler> {
-        Some(KeyboardHandler::new(PKeyboardHandler::new(
-            self.browser.clone(),
-        )))
+        Some(self.keyboard_handler.clone())
     }
 
     fn life_span_handler(&self) -> Option<LifeSpanHandler> {

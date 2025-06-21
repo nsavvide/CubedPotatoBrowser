@@ -58,6 +58,8 @@ impl KeybindingManager {
 
         self.sequence.push_str(key);
 
+        println!("Current sequence: {}", self.sequence);
+
         if let Some(action) = self.bindings.get(&self.sequence) {
             if let VimAction::EnterInsertMode = action {
                 self.in_insert_mode = true;
