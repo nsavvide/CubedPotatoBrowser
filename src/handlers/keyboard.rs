@@ -55,8 +55,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                 return 0;
             }
 
-            println!("on_key_event called");
-
             let key_str = if event.character == 0 {
                 // Ignore non-character key events
                 return 0;
