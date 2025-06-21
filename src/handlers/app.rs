@@ -4,14 +4,14 @@ use std::sync::{Arc, Mutex};
 
 pub struct PApp {
     pub object: *mut RcImpl<cef_dll_sys::_cef_app_t, Self>,
-    pub window: Arc<Mutex<Option<Window>>>,
+    pub windows: Arc<Mutex<Vec<Window>>>,
 }
 
 impl PApp {
-    pub fn new(window: Arc<Mutex<Option<Window>>>) -> App {
+    pub fn new(windows: Arc<Mutex<Vec<Window>>>) -> App {
         App::new(Self {
             object: std::ptr::null_mut(),
-            window,
+            windows,
         })
     }
 }
@@ -29,9 +29,10 @@ impl Clone for PApp {
             rc_impl.interface.add_ref();
             self.object
         };
-        let window = self.window.clone();
 
-        Self { object, window }
+        let windows = self.windows.clone();
+
+        Self { object, windows }
     }
 }
 
@@ -50,6 +51,6 @@ impl ImplApp for PApp {
     }
 
     fn browser_process_handler(&self) -> Option<BrowserProcessHandler> {
-        Some(PBrowserProcessHandler::new(self.window.clone()))
+        Some(PBrowserProcessHandler::new(self.windows.clone()))
     }
 }
