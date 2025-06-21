@@ -16,6 +16,7 @@ pub enum VimAction {
     LeaveInsertMode,
     GoToPrevious,
     GoToNext,
+    OpenDevTools,
 }
 
 pub struct KeybindingManager {
@@ -39,7 +40,7 @@ impl KeybindingManager {
         bindings.insert("i".into(), VimAction::EnterInsertMode);
         bindings.insert("yy".into(), VimAction::YankUrl);
         bindings.insert("<Esc>".into(), VimAction::LeaveInsertMode); // Handle with care
-
+        bindings.insert("D".into(), VimAction::OpenDevTools);
         Self {
             sequence: String::new(),
             bindings,
@@ -68,11 +69,7 @@ impl KeybindingManager {
             return Some(action.clone());
         }
 
-        if !self
-            .bindings
-            .keys()
-            .any(|k| k.starts_with(&self.sequence))
-        {
+        if !self.bindings.keys().any(|k| k.starts_with(&self.sequence)) {
             self.sequence.clear();
         }
 
@@ -83,4 +80,3 @@ impl KeybindingManager {
         self.in_insert_mode
     }
 }
-
