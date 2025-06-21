@@ -1,6 +1,7 @@
 mod browser;
 mod handlers;
 mod sandbox;
+mod utils;
 
 use cef::rc::Rc;
 use cef::{args::Args, *};

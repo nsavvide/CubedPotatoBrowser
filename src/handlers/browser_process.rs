@@ -1,5 +1,5 @@
-use crate::browser::window::create_main_window;
 use crate::browser::client::PClient;
+use crate::browser::window::create_main_window;
 use crate::Window;
 use cef::{rc::*, *};
 use std::sync::{Arc, Mutex};
@@ -55,7 +55,10 @@ impl ImplBrowserProcessHandler for PBrowserProcessHandler {
     // The real lifespan of cef starts from `on_context_initialized`, so all the cef objects should be manipulated after that.
     fn on_context_initialized(&self) {
         println!("cef context initialized");
-        let mut client = PClient::new();
+
+        let browser = Arc::new(Mutex::new(None));
+        let mut client = PClient::new(browser.clone());
+
         let url = CefString::from("https://www.google.com");
 
         let browser_view = browser_view_create(
@@ -67,6 +70,12 @@ impl ImplBrowserProcessHandler for PBrowserProcessHandler {
             Option::<&mut BrowserViewDelegate>::None,
         )
         .expect("Failed to create browser view");
+
+        // Save the browser instance for the keybinding handler
+        if let Some(view_browser) = browser_view.browser() {
+            *browser.lock().unwrap() = Some(view_browser);
+            println!("Browser instance saved in Arc");
+        }
 
         if let Ok(mut window) = self.window.lock() {
             *window = create_main_window(browser_view);
