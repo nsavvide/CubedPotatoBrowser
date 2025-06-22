@@ -61,7 +61,6 @@ cargo run --bin server
 # To run client
 cargo run --bin client
 ```
-```
 
 ## Contributing
 
