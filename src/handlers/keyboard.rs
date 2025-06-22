@@ -2,7 +2,7 @@ use crate::browser::client::PClient;
 use crate::browser::keybinds::{KeybindingManager, VimAction};
 use crate::utils::string::string_utf16_to_utf8;
 use cef::rc::{Rc, RcImpl};
-use cef::{Browser, BrowserSettings, Client, ImplBrowser, ImplBrowserHost, KeyEventType, WindowInfo};
+use cef::{Browser, BrowserSettings, ImplBrowser, ImplBrowserHost, KeyEventType, WindowInfo};
 use cef::{CefString, ImplFrame};
 use cef::{ImplKeyboardHandler, WrapKeyboardHandler};
 use cef_dll_sys::_XEvent;
@@ -57,12 +57,11 @@ impl ImplKeyboardHandler for PKeyboardHandler {
             }
 
             let key_str = if event.character == 0 {
-                // Ignore non-character key events
                 return 0;
             } else {
                 match std::char::from_u32(event.character as u32) {
                     Some(ch) => ch.to_string(),
-                    None => return 0, // ignore unconvertible chars
+                    None => return 0,
                 }
             };
             let mut manager = self.keybindings.lock().unwrap();
@@ -79,7 +78,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                         }
                     }
                     VimAction::OpenDevTools => {
-                        println!("Opening DevTools");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             let host = browser.host().unwrap();
 
@@ -92,7 +90,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                         }
                     }
                     VimAction::GoToBottom => {
-                        println!("Scrolling to bottom");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if let Some(frame) = browser.main_frame() {
                                 // Scroll to the bottom by executing JS on the main frame:
@@ -104,12 +101,86 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                         }
                     }
                     VimAction::GoToTop => {
-                        println!("Scrolling to top");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if let Some(frame) = browser.main_frame() {
                                 // Scroll to the top by executing JS on the main frame:
                                 let js_code = CefString::from("window.scrollTo(0, 0);");
                                 frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollUp => {
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                let js_code = CefString::from("window.scrollBy(0, -100);");
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollDown => {
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                let js_code = CefString::from("window.scrollBy(0, 100);");
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollLeft => {
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                let js_code = CefString::from("window.scrollBy(-100, 0);");
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollRight => {
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                let js_code = CefString::from("window.scrollBy(100, 0);");
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollDownPage => {
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                // Scroll down one "page" (e.g. 80% of the viewport height)
+                                let js_code = CefString::from(
+                                    "window.scrollBy(0, window.innerHeight * 0.8);",
+                                );
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollUpPage => {
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                let js_code = CefString::from(
+                                    "window.scrollBy(0, -window.innerHeight * 0.8);",
+                                );
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::GoToPrevious => {
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if browser.can_go_back() == 1 {
+                                browser.go_back();
+                            }
+                        }
+                    }
+
+                    VimAction::GoToNext => {
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if browser.can_go_forward() == 1 {
+                                browser.go_forward();
                             }
                         }
                     }
