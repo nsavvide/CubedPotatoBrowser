@@ -61,7 +61,7 @@ impl ImplKeyboardHandler for PKeyboardHandler {
             } else {
                 match std::char::from_u32(event.character as u32) {
                     Some(ch) => ch.to_string(),
-                    None => return 0, 
+                    None => return 0,
                 }
             };
             let mut manager = self.keybindings.lock().unwrap();
@@ -78,7 +78,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                         }
                     }
                     VimAction::OpenDevTools => {
-                        println!("Opening DevTools");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             let host = browser.host().unwrap();
 
@@ -91,7 +90,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                         }
                     }
                     VimAction::GoToBottom => {
-                        println!("Scrolling to bottom");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if let Some(frame) = browser.main_frame() {
                                 // Scroll to the bottom by executing JS on the main frame:
@@ -103,7 +101,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                         }
                     }
                     VimAction::GoToTop => {
-                        println!("Scrolling to top");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if let Some(frame) = browser.main_frame() {
                                 // Scroll to the top by executing JS on the main frame:
@@ -114,7 +111,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                     }
 
                     VimAction::ScrollUp => {
-                        println!("Scrolling up");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if let Some(frame) = browser.main_frame() {
                                 let js_code = CefString::from("window.scrollBy(0, -100);");
@@ -124,7 +120,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                     }
 
                     VimAction::ScrollDown => {
-                        println!("Scrolling down");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if let Some(frame) = browser.main_frame() {
                                 let js_code = CefString::from("window.scrollBy(0, 100);");
@@ -134,7 +129,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                     }
 
                     VimAction::ScrollLeft => {
-                        println!("Scrolling left");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if let Some(frame) = browser.main_frame() {
                                 let js_code = CefString::from("window.scrollBy(-100, 0);");
@@ -144,7 +138,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                     }
 
                     VimAction::ScrollRight => {
-                        println!("Scrolling right");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if let Some(frame) = browser.main_frame() {
                                 let js_code = CefString::from("window.scrollBy(100, 0);");
@@ -154,7 +147,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                     }
 
                     VimAction::ScrollDownPage => {
-                        println!("Page down");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if let Some(frame) = browser.main_frame() {
                                 // Scroll down one "page" (e.g. 80% of the viewport height)
@@ -167,7 +159,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                     }
 
                     VimAction::ScrollUpPage => {
-                        println!("Page up");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if let Some(frame) = browser.main_frame() {
                                 let js_code = CefString::from(
@@ -179,7 +170,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                     }
 
                     VimAction::GoToPrevious => {
-                        println!("Going back");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if browser.can_go_back() == 1 {
                                 browser.go_back();
@@ -188,7 +178,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                     }
 
                     VimAction::GoToNext => {
-                        println!("Going forward");
                         if let Some(browser) = self.browser.lock().unwrap().as_ref() {
                             if browser.can_go_forward() == 1 {
                                 browser.go_forward();
