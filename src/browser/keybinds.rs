@@ -29,18 +29,21 @@ impl KeybindingManager {
     pub fn new() -> Self {
         let mut bindings = HashMap::new();
 
-        // Basic normal mode keys
         bindings.insert("j".into(), VimAction::ScrollDown);
         bindings.insert("k".into(), VimAction::ScrollUp);
         bindings.insert("h".into(), VimAction::ScrollLeft);
         bindings.insert("l".into(), VimAction::ScrollRight);
+        bindings.insert("d".into(), VimAction::ScrollDownPage);
+        bindings.insert("u".into(), VimAction::ScrollUpPage);
         bindings.insert("gg".into(), VimAction::GoToTop);
         bindings.insert("G".into(), VimAction::GoToBottom);
         bindings.insert("/".into(), VimAction::SearchMode);
         bindings.insert("i".into(), VimAction::EnterInsertMode);
         bindings.insert("yy".into(), VimAction::YankUrl);
-        bindings.insert("<Esc>".into(), VimAction::LeaveInsertMode); // Handle with care
+        bindings.insert("<Esc>".into(), VimAction::LeaveInsertMode); 
         bindings.insert("D".into(), VimAction::OpenDevTools);
+        bindings.insert("H".into(), VimAction::GoToPrevious);
+        bindings.insert("L".into(), VimAction::GoToNext);
         Self {
             sequence: String::new(),
             bindings,

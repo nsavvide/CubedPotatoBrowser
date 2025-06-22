@@ -2,7 +2,7 @@ use crate::browser::client::PClient;
 use crate::browser::keybinds::{KeybindingManager, VimAction};
 use crate::utils::string::string_utf16_to_utf8;
 use cef::rc::{Rc, RcImpl};
-use cef::{Browser, BrowserSettings, Client, ImplBrowser, ImplBrowserHost, KeyEventType, WindowInfo};
+use cef::{Browser, BrowserSettings, ImplBrowser, ImplBrowserHost, KeyEventType, WindowInfo};
 use cef::{CefString, ImplFrame};
 use cef::{ImplKeyboardHandler, WrapKeyboardHandler};
 use cef_dll_sys::_XEvent;
@@ -110,6 +110,89 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                                 // Scroll to the top by executing JS on the main frame:
                                 let js_code = CefString::from("window.scrollTo(0, 0);");
                                 frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollUp => {
+                        println!("Scrolling up");
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                let js_code = CefString::from("window.scrollBy(0, -100);");
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollDown => {
+                        println!("Scrolling down");
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                let js_code = CefString::from("window.scrollBy(0, 100);");
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollLeft => {
+                        println!("Scrolling left");
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                let js_code = CefString::from("window.scrollBy(-100, 0);");
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollRight => {
+                        println!("Scrolling right");
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                let js_code = CefString::from("window.scrollBy(100, 0);");
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollDownPage => {
+                        println!("Page down");
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                // Scroll down one "page" (e.g. 80% of the viewport height)
+                                let js_code = CefString::from(
+                                    "window.scrollBy(0, window.innerHeight * 0.8);",
+                                );
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::ScrollUpPage => {
+                        println!("Page up");
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                let js_code = CefString::from(
+                                    "window.scrollBy(0, -window.innerHeight * 0.8);",
+                                );
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
+                    VimAction::GoToPrevious => {
+                        println!("Going back");
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if browser.can_go_back() == 1 {
+                                browser.go_back();
+                            }
+                        }
+                    }
+
+                    VimAction::GoToNext => {
+                        println!("Going forward");
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if browser.can_go_forward() == 1 {
+                                browser.go_forward();
                             }
                         }
                     }
