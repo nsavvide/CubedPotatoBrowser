@@ -1,5 +1,6 @@
 use crate::browser::client::PClient;
 use crate::browser::keybinds::{KeybindingManager, VimAction};
+use crate::constants::key_codes::ESC_CODE;
 use crate::utils::string::string_utf16_to_utf8;
 use cef::rc::{Rc, RcImpl};
 use cef::{Browser, BrowserSettings, ImplBrowser, ImplBrowserHost, KeyEventType, WindowInfo};
@@ -60,7 +61,7 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                 return 0;
             } else {
                 match event.character {
-                    27 => "<Esc>".to_string(),
+                    ESC_CODE => "<Esc>".to_string(),
                     c if (32..127).contains(&c) => (c as u8 as char).to_string(),
                     _ => return 0,
                 }

@@ -86,5 +86,9 @@ impl KeybindingManager {
 
     pub fn set_insert_mode(&mut self, mode: bool) {
         self.in_insert_mode = mode;
+
+        if !mode {
+            self.sequence.clear();
+        }
     }
 }
