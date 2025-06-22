@@ -57,12 +57,11 @@ impl ImplKeyboardHandler for PKeyboardHandler {
             }
 
             let key_str = if event.character == 0 {
-                // Ignore non-character key events
                 return 0;
             } else {
                 match std::char::from_u32(event.character as u32) {
                     Some(ch) => ch.to_string(),
-                    None => return 0, // ignore unconvertible chars
+                    None => return 0, 
                 }
             };
             let mut manager = self.keybindings.lock().unwrap();
