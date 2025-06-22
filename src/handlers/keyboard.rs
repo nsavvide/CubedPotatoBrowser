@@ -1,5 +1,6 @@
 use crate::browser::client::PClient;
 use crate::browser::keybinds::{KeybindingManager, VimAction};
+use crate::constants::key_codes::ESC_CODE;
 use crate::utils::string::string_utf16_to_utf8;
 use cef::rc::{Rc, RcImpl};
 use cef::{Browser, BrowserSettings, ImplBrowser, ImplBrowserHost, KeyEventType, WindowInfo};
@@ -59,11 +60,13 @@ impl ImplKeyboardHandler for PKeyboardHandler {
             let key_str = if event.character == 0 {
                 return 0;
             } else {
-                match std::char::from_u32(event.character as u32) {
-                    Some(ch) => ch.to_string(),
-                    None => return 0,
+                match event.character {
+                    ESC_CODE => "<Esc>".to_string(),
+                    c if (32..127).contains(&c) => (c as u8 as char).to_string(),
+                    _ => return 0,
                 }
             };
+
             let mut manager = self.keybindings.lock().unwrap();
             println!("Key pressed: {}", key_str);
 
@@ -184,6 +187,16 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                             }
                         }
                     }
+
+                    // Todo: Add JS script to find insert input fields
+                    VimAction::EnterInsertMode => {
+                        manager.set_insert_mode(true);
+                    }
+
+                    VimAction::LeaveInsertMode => {
+                        manager.set_insert_mode(false);
+                    }
+
                     other => println!("VimAction triggered: {:?}", other),
                 }
 

@@ -40,7 +40,7 @@ impl KeybindingManager {
         bindings.insert("/".into(), VimAction::SearchMode);
         bindings.insert("i".into(), VimAction::EnterInsertMode);
         bindings.insert("yy".into(), VimAction::YankUrl);
-        bindings.insert("<Esc>".into(), VimAction::LeaveInsertMode); 
+        bindings.insert("<Esc>".into(), VimAction::LeaveInsertMode);
         bindings.insert("D".into(), VimAction::OpenDevTools);
         bindings.insert("H".into(), VimAction::GoToPrevious);
         bindings.insert("L".into(), VimAction::GoToNext);
@@ -53,8 +53,9 @@ impl KeybindingManager {
 
     pub fn push_key(&mut self, key: &str) -> Option<VimAction> {
         if self.in_insert_mode {
-            if key == "<Esc>" {
+            if key == "<Esc>" || key == "\u{1b}" {
                 self.in_insert_mode = false;
+                self.sequence.clear();
                 return Some(VimAction::LeaveInsertMode);
             }
             return None;
@@ -81,5 +82,13 @@ impl KeybindingManager {
 
     pub fn is_insert_mode(&self) -> bool {
         self.in_insert_mode
+    }
+
+    pub fn set_insert_mode(&mut self, mode: bool) {
+        self.in_insert_mode = mode;
+
+        if !mode {
+            self.sequence.clear();
+        }
     }
 }
