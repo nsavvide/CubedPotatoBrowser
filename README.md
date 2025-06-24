@@ -62,6 +62,11 @@ cargo run --bin server
 cargo run --bin client
 ```
 
+## Wayland issues
+
+- The browser does not start in a tiled manner (floating by default)
+    - Just use the following in your `~/.config/hypr/windowrules.conf`: `windowrulev2 = tile, title:^(Potato Browser)$`
+
 ## Contributing
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
