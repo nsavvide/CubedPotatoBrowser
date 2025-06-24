@@ -1,5 +1,6 @@
 use crate::handlers::keyboard::PKeyboardHandler;
 use crate::handlers::lifespan_handler::PLifeSpanHandler;
+use adblock::Engine;
 use cef::{rc::*, Client, *};
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -8,15 +9,17 @@ pub struct PClient {
     object: *mut RcImpl<cef_dll_sys::_cef_client_t, Self>,
     pub browser: Arc<Mutex<Option<Browser>>>,
     pub keyboard_handler: KeyboardHandler,
+    pub adblock_engine: Arc<Mutex<Engine>>,
 }
 
 impl PClient {
-    pub fn new(browser: Arc<Mutex<Option<Browser>>>) -> Client {
+    pub fn new(browser: Arc<Mutex<Option<Browser>>>, engine: Arc<Mutex<Engine>>) -> Client {
         let keyboard_handler = KeyboardHandler::new(PKeyboardHandler::new(browser.clone()));
         Client::new(Self {
             object: std::ptr::null_mut(),
             browser,
             keyboard_handler,
+            adblock_engine: engine,
         })
     }
 }
