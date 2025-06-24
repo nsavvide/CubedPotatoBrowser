@@ -65,6 +65,7 @@ impl ImplWindowDelegate for PWindowDelegate {
         if let Some(window) = window {
             let view = self.browser_view.clone();
             window.add_child_view(Some(&mut (&view).into()));
+            window.set_title(Some(&CefString::from("Potato Browser")));
             window.show();
         }
     }
