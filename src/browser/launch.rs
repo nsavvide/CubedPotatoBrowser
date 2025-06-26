@@ -1,5 +1,6 @@
 use std::sync::{Arc, Mutex};
 
+use adblock::Engine;
 use cef::{
     browser_view_create, post_task, CefString, ImplBrowserView, ImplWindow, Task, ThreadId, Window,
 };
@@ -8,12 +9,13 @@ use cef_dll_sys::cef_thread_id_t;
 use crate::browser::{client::PClient, window::create_main_window};
 use crate::utils::spawn_task::SpawnWindowTask;
 
-pub fn spawn_browser_window(shared_windows: Arc<Mutex<Vec<Window>>>) {
+pub fn spawn_browser_window(shared_windows: Arc<Mutex<Vec<Window>>>, adblock_engine: Arc<Mutex<Engine>>) {
     let windows = Arc::clone(&shared_windows);
+    let engine = Arc::clone(&adblock_engine);
 
     let inner = SpawnWindowTask::new(move || {
         let browser = Arc::new(Mutex::new(None));
-        let mut client = PClient::new(browser.clone());
+        let mut client = PClient::new(browser.clone(), engine.clone());
 
         let url = CefString::from("https://www.google.com");
         let browser_view = browser_view_create(

@@ -5,18 +5,19 @@ use std::{
     thread,
 };
 
+use adblock::Engine;
 use cef::sys;
 use cef::{
     api_hash, args::Args, execute_process, initialize, run_message_loop, shutdown, CefString,
     ImplCommandLine, Window,
 };
-use potato_browser::{browser::launch::spawn_browser_window, handlers::app::PApp, sandbox};
+use potato_browser::{browser::launch::spawn_browser_window, handlers::app::PApp, sandbox, utils::adblock::create_adblock_engine};
 
 use std::{fs, os::unix::net::UnixListener, path::Path};
 
 const SOCKET_PATH: &str = "/tmp/potato.sock";
 
-fn start_ipc_thread(windows: Arc<Mutex<Vec<Window>>>) {
+fn start_ipc_thread(windows: Arc<Mutex<Vec<Window>>>, adblock_engine: Arc<Mutex<Engine>>) {
     if Path::new(SOCKET_PATH).exists() {
         fs::remove_file(SOCKET_PATH).expect("Failed to remove old socket");
     }
@@ -30,7 +31,8 @@ fn start_ipc_thread(windows: Arc<Mutex<Vec<Window>>>) {
                 Ok(stream) => {
                     println!("[Server] New client connected");
                     let windows_clone = Arc::clone(&windows);
-                    thread::spawn(move || handle_client(stream, windows_clone));
+                    let adblock_engine_clone = Arc::clone(&adblock_engine);
+                    thread::spawn(move || handle_client(stream, windows_clone, adblock_engine_clone));
                 }
                 Err(e) => eprintln!("[Server] Connection failed: {}", e),
             }
@@ -38,7 +40,7 @@ fn start_ipc_thread(windows: Arc<Mutex<Vec<Window>>>) {
     });
 }
 
-fn handle_client(stream: UnixStream, windows: Arc<Mutex<Vec<Window>>>) {
+fn handle_client(stream: UnixStream, windows: Arc<Mutex<Vec<Window>>>, adblock_engine: Arc<Mutex<Engine>>) {
     let reader = BufReader::new(stream);
 
     for line in reader.lines() {
@@ -47,7 +49,7 @@ fn handle_client(stream: UnixStream, windows: Arc<Mutex<Vec<Window>>>) {
                 println!("[Server] Received: {}", message.trim());
                 if message.trim() == "OpenNewWindow" {
                     println!("[Server] Spawning browser window...");
-                    spawn_browser_window(windows.clone());
+                    spawn_browser_window(windows.clone(), adblock_engine.clone());
                 }
             }
             Err(e) => {
@@ -65,7 +67,10 @@ fn main() {
     let sandbox = sandbox::create_sandbox();
     let is_browser_process = cmd.has_switch(Some(&CefString::from("type"))) != 1;
 
-    let settings = cef::Settings { remote_debugging_port: 2012, ..Default::default() };
+    let settings = cef::Settings {
+        remote_debugging_port: 2012,
+        ..Default::default()
+    };
 
     let windows: Arc<Mutex<Vec<Window>>> = Arc::new(Mutex::new(vec![]));
     let mut app = PApp::new(windows.clone());
@@ -92,7 +97,9 @@ fn main() {
         1
     );
 
-    start_ipc_thread(windows.clone());
+let adblock_engine = create_adblock_engine();
+
+    start_ipc_thread(windows.clone(), adblock_engine.clone());
 
     run_message_loop();
 
