@@ -1,5 +1,6 @@
 use crate::handlers::keyboard::PKeyboardHandler;
 use crate::handlers::lifespan_handler::PLifeSpanHandler;
+use crate::handlers::request::PRequestHandler;
 use adblock::Engine;
 use cef::{rc::*, Client, *};
 use std::sync::Arc;
@@ -30,6 +31,12 @@ impl WrapClient for PClient {
     }
 }
 
+impl WrapRequestHandler for PRequestHandler {
+    fn wrap_rc(&mut self, object: *mut RcImpl<cef_dll_sys::_cef_request_handler_t, Self>) {
+        self.object = object.cast();
+    }
+}
+
 impl Clone for PClient {
     fn clone(&self) -> Self {
         unsafe {
@@ -41,6 +48,7 @@ impl Clone for PClient {
             object: self.object,
             browser: self.browser.clone(),
             keyboard_handler: self.keyboard_handler.clone(),
+            adblock_engine: self.adblock_engine.clone(),
         }
     }
 }
@@ -65,5 +73,11 @@ impl ImplClient for PClient {
 
     fn life_span_handler(&self) -> Option<LifeSpanHandler> {
         Some(PLifeSpanHandler::new(self.browser.clone()))
+    }
+
+    fn request_handler(&self) -> Option<RequestHandler> {
+        Some(RequestHandler::new(PRequestHandler::new(
+            self.adblock_engine.clone(),
+        )))
     }
 }

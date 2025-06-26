@@ -5,6 +5,7 @@ use std::{
     thread,
 };
 
+use adblock::Engine;
 use cef::sys;
 use cef::{
     api_hash, args::Args, execute_process, initialize, run_message_loop, shutdown, CefString,
@@ -30,7 +31,8 @@ fn start_ipc_thread(windows: Arc<Mutex<Vec<Window>>>, adblock_engine: Arc<Mutex<
                 Ok(stream) => {
                     println!("[Server] New client connected");
                     let windows_clone = Arc::clone(&windows);
-                    thread::spawn(move || handle_client(stream, windows_clone, adblock_engine.clone()));
+                    let adblock_engine_clone = Arc::clone(&adblock_engine);
+                    thread::spawn(move || handle_client(stream, windows_clone, adblock_engine_clone));
                 }
                 Err(e) => eprintln!("[Server] Connection failed: {}", e),
             }
@@ -95,7 +97,7 @@ fn main() {
         1
     );
 
-    let adblock_engine = Arc::new(Mutex::new(create_adblock_engine()));
+let adblock_engine = create_adblock_engine();
 
     start_ipc_thread(windows.clone(), adblock_engine.clone());
 
