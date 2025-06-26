@@ -47,7 +47,7 @@ impl ImplResourceRequestHandler for PResourceRequestHandler {
 
             let source_url = _frame
                 .map(|f| string_utf16_to_utf8(&f.url()))
-                .unwrap_or_else(String::new);
+                .unwrap_or_default();
 
             let request_type_str = infer_request_type(&url_str);
 
@@ -76,7 +76,7 @@ impl ImplResourceRequestHandler for PResourceRequestHandler {
     }
 
     fn get_raw(&self) -> *mut cef_dll_sys::_cef_resource_request_handler_t {
-        std::ptr::null_mut()
+        self.object
     }
 }
 
