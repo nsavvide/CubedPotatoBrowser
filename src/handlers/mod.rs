@@ -1,5 +1,6 @@
 pub mod app;
 pub mod browser_process;
+pub mod render_process;
 pub mod keyboard;
 pub mod request;
 pub mod lifespan_handler;
