@@ -1,5 +1,5 @@
 use cef::{rc::*, *};
-use crate::handlers::browser_process::PBrowserProcessHandler;
+use crate::handlers::{browser_process::PBrowserProcessHandler, render_process::PRenderHandler};
 use std::sync::{Arc, Mutex};
 
 pub struct PApp {
@@ -52,5 +52,9 @@ impl ImplApp for PApp {
 
     fn browser_process_handler(&self) -> Option<BrowserProcessHandler> {
         Some(PBrowserProcessHandler::new(self.windows.clone()))
+    }
+
+    fn render_process_handler(&self) -> Option<RenderProcessHandler> {
+        Some(PRenderHandler::new())
     }
 }

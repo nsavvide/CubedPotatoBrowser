@@ -15,6 +15,7 @@ pub fn spawn_browser_window(shared_windows: Arc<Mutex<Vec<Window>>>, adblock_eng
 
     let inner = SpawnWindowTask::new(move || {
         let browser = Arc::new(Mutex::new(None));
+
         let mut client = PClient::new(browser.clone(), engine.clone());
 
         let url = CefString::from("https://www.google.com");

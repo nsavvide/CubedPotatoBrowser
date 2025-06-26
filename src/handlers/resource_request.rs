@@ -1,8 +1,9 @@
 use adblock::request::Request as AdblockRequest;
 use adblock::Engine;
-use cef::rc::RcImpl;
+use cef::rc::{Rc, RcImpl};
 use cef::{
-    Browser, Callback, ImplFrame, ImplRequest, ImplResourceRequestHandler, Request, ReturnValue, WrapResourceRequestHandler,
+    Browser, Callback, ImplFrame, ImplRequest, ImplResourceRequestHandler, Request, ReturnValue,
+    WrapResourceRequestHandler,
 };
 use cef_dll_sys::cef_return_value_t;
 use std::sync::{Arc, Mutex};
@@ -25,7 +26,7 @@ impl PResourceRequestHandler {
     }
 }
 
-impl cef::rc::Rc for PResourceRequestHandler {
+impl Rc for PResourceRequestHandler {
     fn as_base(&self) -> &cef_dll_sys::cef_base_ref_counted_t {
         unsafe {
             let base = &*self.object;
@@ -60,10 +61,7 @@ impl ImplResourceRequestHandler for PResourceRequestHandler {
                         .check_network_request(&adblock_req);
 
                     if result.matched {
-                        println!("[Adblock] BLOCKED: {}", adblock_req.url);
                         return ReturnValue::from(cef_return_value_t::RV_CANCEL);
-                    } else {
-                        println!("[Adblock] ALLOWED: {}", adblock_req.url);
                     }
                 }
                 Err(err) => {

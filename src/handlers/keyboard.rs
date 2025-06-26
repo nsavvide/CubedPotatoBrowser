@@ -3,12 +3,20 @@ use crate::browser::keybinds::{KeybindingManager, VimAction};
 use crate::constants::key_codes::ESC_CODE;
 use crate::utils::string::string_utf16_to_utf8;
 use cef::rc::{Rc, RcImpl};
-use cef::{Browser, BrowserSettings, ImplBrowser, ImplBrowserHost, KeyEventType, WindowInfo};
+use cef::{
+    Browser, BrowserSettings, ImplBrowser, ImplBrowserHost, KeyEventType, KeyboardHandler,
+    WindowInfo,
+};
 use cef::{CefString, ImplFrame};
 use cef::{ImplKeyboardHandler, WrapKeyboardHandler};
 use cef_dll_sys::_XEvent;
 use cef_dll_sys::cef_key_event_type_t;
 use std::sync::{Arc, Mutex};
+
+pub struct KeyboardHandlerBundle {
+    pub handler: Option<KeyboardHandler>,
+    pub implementation: PKeyboardHandler,
+}
 
 pub struct PKeyboardHandler {
     pub object: *mut RcImpl<cef_dll_sys::_cef_keyboard_handler_t, Self>,
@@ -23,6 +31,10 @@ impl PKeyboardHandler {
             keybindings: Arc::new(Mutex::new(KeybindingManager::new())),
             browser,
         }
+    }
+
+    pub fn set_insert_mode(&self, enabled: bool) {
+        self.keybindings.lock().unwrap().set_insert_mode(enabled);
     }
 }
 
@@ -69,6 +81,17 @@ impl ImplKeyboardHandler for PKeyboardHandler {
 
             let mut manager = self.keybindings.lock().unwrap();
             println!("Key pressed: {}", key_str);
+
+            if manager.is_insert_mode() {
+                if key_str == "<Esc>" {
+                    if let Some(VimAction::LeaveInsertMode) = manager.push_key(&key_str) {
+                        manager.set_insert_mode(false);
+                        return 1; // handled
+                    }
+                }
+
+                return 0; // let the page handle other keys
+            }
 
             if let Some(action) = manager.push_key(&key_str) {
                 match action {
@@ -188,7 +211,6 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                         }
                     }
 
-                    // Todo: Add JS script to find insert input fields
                     VimAction::EnterInsertMode => {
                         manager.set_insert_mode(true);
                     }
@@ -210,9 +232,8 @@ impl ImplKeyboardHandler for PKeyboardHandler {
 
 impl Clone for PKeyboardHandler {
     fn clone(&self) -> Self {
-        unsafe {
-            let rc_impl = &mut *self.object;
-            rc_impl.interface.add_ref();
+        if self.object.is_null() {
+            panic!("Tried to clone PKeyboardHandler before wrap_rc() was called");
         }
 
         Self {
@@ -222,3 +243,6 @@ impl Clone for PKeyboardHandler {
         }
     }
 }
+
+unsafe impl Send for PKeyboardHandler {}
+unsafe impl Sync for PKeyboardHandler {}

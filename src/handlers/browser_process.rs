@@ -54,34 +54,5 @@ impl ImplBrowserProcessHandler for PBrowserProcessHandler {
 
     fn on_context_initialized(&self) {
         println!("cef context initialized");
-
-        // let browser = Arc::new(Mutex::new(None));
-        // let mut client = PClient::new(browser.clone());
-
-        // let url = CefString::from("https://www.google.com");
-
-        // let browser_view = browser_view_create(
-        //     Some(&mut client),
-        //     Some(&url),
-        //     Some(&Default::default()),
-        //     None::<&mut cef::DictionaryValue>,
-        //     None::<&mut cef::RequestContext>,
-        //     None::<&mut cef::BrowserViewDelegate>,
-        // )
-        // .expect("Failed to create browser view");
-
-        // if let Some(view_browser) = browser_view.browser() {
-        //     *browser.lock().unwrap() = Some(view_browser);
-        //     println!("Browser instance saved in Arc");
-        // }
-
-        // Create and store the new window
-        // if let Ok(mut windows) = self.windows.lock() {
-        //     if let Some(window) = create_main_window(browser_view) {
-        //         windows.push(window);
-        //     } else {
-        //         eprintln!("[BrowserProcessHandler] Failed to create main window");
-        //     }
-        // }
     }
 }
