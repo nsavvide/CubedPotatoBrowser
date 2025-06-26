@@ -31,12 +31,6 @@ impl WrapClient for PClient {
     }
 }
 
-impl WrapRequestHandler for PRequestHandler {
-    fn wrap_rc(&mut self, object: *mut RcImpl<cef_dll_sys::_cef_request_handler_t, Self>) {
-        self.object = object.cast();
-    }
-}
-
 impl Clone for PClient {
     fn clone(&self) -> Self {
         unsafe {

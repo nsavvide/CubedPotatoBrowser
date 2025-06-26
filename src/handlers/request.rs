@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 use crate::handlers::resource_request::PResourceRequestHandler;
 use adblock::Engine;
 use cef::rc::{Rc, RcImpl};
-use cef::{ImplRequestHandler, ResourceRequestHandler};
+use cef::{ImplRequestHandler, ResourceRequestHandler, WrapRequestHandler};
 
 #[derive(Clone)]
 pub struct PRequestHandler {
@@ -17,6 +17,12 @@ impl PRequestHandler {
             engine,
             object: std::ptr::null_mut(),
         }
+    }
+}
+
+impl WrapRequestHandler for PRequestHandler {
+    fn wrap_rc(&mut self, object: *mut RcImpl<cef_dll_sys::_cef_request_handler_t, Self>) {
+        self.object = object.cast();
     }
 }
 
