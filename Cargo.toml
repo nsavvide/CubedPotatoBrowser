@@ -9,6 +9,8 @@ repository = "https://github.com/nielssav/potato-browser"
 [dependencies]
 cef = { path = "cef" }
 cef-dll-sys = { path = "sys" }
+adblock = "0.10.1"
+regex = "1" 
 
 [workspace]
 resolver = "2"
