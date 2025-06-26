@@ -21,6 +21,7 @@ pub fn create_adblock_engine() -> Arc<Mutex<Engine>> {
         include_str!("../assets/filters/resource-abuse.txt"),
         include_str!("../assets/filters/ubo-link-shorteners.txt"),
         include_str!("../assets/filters/ubol-filters.txt"),
+        include_str!("../assets/filters/youtube_and_google.txt"),
     ];
 
     let mut filter_set = FilterSet::default();
