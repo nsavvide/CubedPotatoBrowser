@@ -232,6 +232,12 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                         }
                     }
 
+                    VimAction::Refresh => {
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            browser.reload();
+                        }
+                    }
+
                     VimAction::EnterInsertMode => {
                         manager.set_insert_mode(true);
                     }
