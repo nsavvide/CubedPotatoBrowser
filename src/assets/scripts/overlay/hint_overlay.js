@@ -12,9 +12,9 @@ document.querySelectorAll('.cef-hint-overlay').forEach(el => el.remove());
     z-index: 999999;
     pointer-events: none;
     line-height: 1;
-    transform: translate(-50%, -50%);
-    text-align: center;
     white-space: nowrap;
+    transform: translate(-100%, -50%); /* align left center */
+    text-align: right;
   `;
 
   const HOME_ROW_HINTS = [
@@ -31,7 +31,7 @@ document.querySelectorAll('.cef-hint-overlay').forEach(el => el.remove());
       const b = i % HOME_ROW_HINTS.length;
       return HOME_ROW_HINTS[a] + HOME_ROW_HINTS[b];
     }
-    return ''; // no hint beyond limit
+    return '';
   };
 
   const elements = [
@@ -53,9 +53,9 @@ document.querySelectorAll('.cef-hint-overlay').forEach(el => el.remove());
     hint.setAttribute(
       'style',
       HINT_STYLE +
-        `top: ${rect.top + window.scrollY + rect.height / 2}px;` +
-        `left: ${rect.left + window.scrollX + rect.width / 2}px;` +
-        (isEditable ? 'background: rgba(0, 255, 0, 0.6);' : '')
+      `top: ${rect.top + window.scrollY + rect.height / 2}px;` +
+      `left: ${rect.left + window.scrollX - 6}px;` + // -6 for a small gap
+      (isEditable ? 'background: rgba(0, 255, 0, 0.6);' : '')
     );
 
     document.body.appendChild(hint);
