@@ -18,6 +18,7 @@ pub enum VimAction {
     GoToNext,
     OpenDevTools,
     ShowOverlay,
+    Refresh,
 }
 
 pub struct KeybindingManager {
@@ -47,6 +48,7 @@ impl KeybindingManager {
         bindings.insert("H".into(), VimAction::GoToPrevious);
         bindings.insert("L".into(), VimAction::GoToNext);
         bindings.insert("f".into(), VimAction::ShowOverlay);
+        bindings.insert("r".into(), VimAction::Refresh);
         Self {
             sequence: String::new(),
             bindings,
