@@ -579,5 +579,8 @@
 0.0.0.0 www.googleadservices.com
 0.0.0.0 www.googletagservices.com
 0.0.0.0 www.ukrpts.net
+
+youtube.com##+js(addEventListener-defuser.js, keydown)
+
 # End of The Quantum Ad-List
 

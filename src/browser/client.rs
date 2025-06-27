@@ -2,6 +2,7 @@ use crate::handlers::keyboard::{KeyboardHandlerBundle, PKeyboardHandler};
 use crate::handlers::lifespan_handler::PLifeSpanHandler;
 use crate::handlers::load::PLoadHandler;
 use crate::handlers::request::PRequestHandler;
+use crate::utils::string::string_utf16_to_utf8;
 use adblock::Engine;
 use cef::{rc::*, Client, *};
 use std::ffi::c_int;
@@ -109,22 +110,47 @@ impl ImplClient for PClient {
 
     fn on_process_message_received(
         &self,
-        _browser: Option<&mut Browser>,
+        browser: Option<&mut Browser>,
         _frame: Option<&mut Frame>,
         _source_process: ProcessId,
         message: Option<&mut ProcessMessage>,
     ) -> c_int {
         if let Some(msg) = message {
-            if CefString::from(&msg.name()).to_string() == "UpdateInsertMode" {
-                if let Some(args) = msg.argument_list() {
-                    let is_editing = args.bool(0);
-                    if let Some(bundle) = &self.keyboard {
-                        bundle.implementation.set_insert_mode(is_editing != 0);
+            let msg_name = CefString::from(&msg.name()).to_string();
+
+            match msg_name.as_str() {
+                "UpdateInsertMode" => {
+                    if let Some(args) = msg.argument_list() {
+                        let is_editing = args.bool(0);
+                        if let Some(bundle) = &self.keyboard {
+                            bundle.implementation.set_insert_mode(is_editing != 0);
+                        }
+                        return 1;
                     }
-                    return 1;
                 }
+
+                "HintClick" => {
+                    if let Some(args) = msg.argument_list() {
+                        let url = string_utf16_to_utf8(&args.string(0));
+
+                        if !url.is_empty() {
+                            println!("HintClick: navigating to {}", url);
+
+                            if let Some(browser) = browser {
+                                if let Some(frame) = browser.main_frame() {
+                                    let cef_url = CefString::from(url.as_str());
+                                    frame.load_url(Some(&cef_url));
+                                    return 1;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                _ => {}
             }
         }
+
         0
     }
 }
