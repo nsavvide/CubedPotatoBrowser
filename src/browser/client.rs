@@ -1,5 +1,6 @@
 use crate::handlers::keyboard::{KeyboardHandlerBundle, PKeyboardHandler};
 use crate::handlers::lifespan_handler::PLifeSpanHandler;
+use crate::handlers::load::PLoadHandler;
 use crate::handlers::request::PRequestHandler;
 use adblock::Engine;
 use cef::{rc::*, Client, *};
@@ -100,6 +101,10 @@ impl ImplClient for PClient {
         Some(RequestHandler::new(PRequestHandler::new(
             self.adblock_engine.clone(),
         )))
+    }
+
+    fn load_handler(&self) -> Option<LoadHandler> {
+        Some(PLoadHandler::new())
     }
 
     fn on_process_message_received(
