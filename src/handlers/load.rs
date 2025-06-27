@@ -42,10 +42,14 @@ impl ImplLoadHandler for PLoadHandler {
     ) {
         if let Some(frame) = frame {
             if frame.is_main() == 1 {
-                let script =
+                let load_command_bar =
                     CefString::from(include_str!("../assets/scripts/command_bar/command_bar.js"));
 
-                frame.execute_java_script(Some(&script), None, 0);
+                frame.execute_java_script(Some(&load_command_bar), None, 0);
+
+                let remove_hints =
+                    CefString::from(include_str!("../assets/scripts/overlay/remove_overlay.js"));
+                frame.execute_java_script(Some(&remove_hints), None, 0);
             }
         }
     }
