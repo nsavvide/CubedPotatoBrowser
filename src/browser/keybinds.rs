@@ -17,12 +17,14 @@ pub enum VimAction {
     GoToPrevious,
     GoToNext,
     OpenDevTools,
+    ShowOverlay,
 }
 
 pub struct KeybindingManager {
     sequence: String,
     bindings: HashMap<String, VimAction>,
     in_insert_mode: bool,
+    show_overlay: bool,
 }
 
 impl KeybindingManager {
@@ -44,10 +46,12 @@ impl KeybindingManager {
         bindings.insert("D".into(), VimAction::OpenDevTools);
         bindings.insert("H".into(), VimAction::GoToPrevious);
         bindings.insert("L".into(), VimAction::GoToNext);
+        bindings.insert("f".into(), VimAction::ShowOverlay);
         Self {
             sequence: String::new(),
             bindings,
             in_insert_mode: false,
+            show_overlay: false,
         }
     }
 
@@ -87,6 +91,17 @@ impl KeybindingManager {
     pub fn set_insert_mode(&mut self, mode: bool) {
         self.in_insert_mode = mode;
         if !mode {
+            self.sequence.clear();
+        }
+    }
+
+    pub fn is_show_overlay(&self) -> bool {
+        self.show_overlay
+    }
+
+    pub fn set_show_overlay(&mut self, show: bool) {
+        self.show_overlay = show;
+        if !show {
             self.sequence.clear();
         }
     }

@@ -1,28 +1,34 @@
-use crate::handlers::keyboard::KeyboardHandlerBundle;
-use crate::handlers::keyboard::PKeyboardHandler;
+use crate::handlers::keyboard::{KeyboardHandlerBundle, PKeyboardHandler};
 use crate::handlers::lifespan_handler::PLifeSpanHandler;
 use crate::handlers::request::PRequestHandler;
 use adblock::Engine;
 use cef::{rc::*, Client, *};
 use std::ffi::c_int;
-use std::sync::Arc;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 pub struct PClient {
     object: *mut RcImpl<cef_dll_sys::_cef_client_t, Self>,
     pub browser: Arc<Mutex<Option<Browser>>>,
+    pub window: Arc<Mutex<Option<Window>>>,
+    pub windows: Arc<Mutex<Vec<Window>>>,
     pub keyboard: Option<KeyboardHandlerBundle>,
     pub adblock_engine: Arc<Mutex<Engine>>,
 }
 
 impl PClient {
-    pub fn new(browser: Arc<Mutex<Option<Browser>>>, engine: Arc<Mutex<Engine>>) -> Client {
-
+    pub fn new(
+        browser: Arc<Mutex<Option<Browser>>>,
+        window: Arc<Mutex<Option<Window>>>,
+        windows: Arc<Mutex<Vec<Window>>>,
+        engine: Arc<Mutex<Engine>>,
+    ) -> Client {
         let keyboard_impl = PKeyboardHandler::new(browser.clone());
 
         Client::new(Self {
             object: std::ptr::null_mut(),
             browser,
+            window,
+            windows,
             keyboard: Some(KeyboardHandlerBundle {
                 handler: None,
                 implementation: keyboard_impl,
@@ -39,7 +45,7 @@ impl WrapClient for PClient {
         if let Some(bundle) = &mut self.keyboard {
             bundle.implementation.wrap_rc(object.cast());
             bundle.handler = Some(KeyboardHandler::new(bundle.implementation.clone()));
-        } 
+        }
     }
 }
 
@@ -53,11 +59,11 @@ impl Clone for PClient {
         Self {
             object: self.object,
             browser: self.browser.clone(),
-            keyboard: self.keyboard.as_ref().map(|bundle| {
-                KeyboardHandlerBundle {
-                    handler: bundle.handler.clone(),
-                    implementation: bundle.implementation.clone(),
-                }
+            window: self.window.clone(),
+            windows: self.windows.clone(),
+            keyboard: self.keyboard.as_ref().map(|bundle| KeyboardHandlerBundle {
+                handler: bundle.handler.clone(),
+                implementation: bundle.implementation.clone(),
             }),
             adblock_engine: self.adblock_engine.clone(),
         }
@@ -83,7 +89,11 @@ impl ImplClient for PClient {
     }
 
     fn life_span_handler(&self) -> Option<LifeSpanHandler> {
-        Some(PLifeSpanHandler::new(self.browser.clone()))
+        Some(PLifeSpanHandler::new(
+            self.browser.clone(),
+            self.window.clone(),
+            self.windows.clone(),
+        ))
     }
 
     fn request_handler(&self) -> Option<RequestHandler> {

@@ -211,6 +211,27 @@ impl ImplKeyboardHandler for PKeyboardHandler {
                         }
                     }
 
+                    VimAction::ShowOverlay => {
+                        let should_show = !manager.is_show_overlay();
+                        manager.set_show_overlay(should_show);
+
+                        if let Some(browser) = self.browser.lock().unwrap().as_ref() {
+                            if let Some(frame) = browser.main_frame() {
+                                let js_code = if manager.is_show_overlay() {
+                                    CefString::from(include_str!(
+                                        "../assets/scripts/overlay/hint_overlay.js"
+                                    ))
+                                } else {
+                                    CefString::from(include_str!(
+                                        "../assets/scripts/overlay/remove_overlay.js"
+                                    ))
+                                };
+
+                                frame.execute_java_script(Some(&js_code), None, 0);
+                            }
+                        }
+                    }
+
                     VimAction::EnterInsertMode => {
                         manager.set_insert_mode(true);
                     }
