@@ -82,10 +82,6 @@ impl Rc for PClient {
 }
 
 impl ImplClient for PClient {
-    fn get_raw(&self) -> *mut cef_dll_sys::_cef_client_t {
-        self.object.cast()
-    }
-
     fn keyboard_handler(&self) -> Option<KeyboardHandler> {
         self.keyboard.as_ref().and_then(|b| b.handler.clone())
     }
@@ -98,14 +94,14 @@ impl ImplClient for PClient {
         ))
     }
 
+    fn load_handler(&self) -> Option<LoadHandler> {
+        Some(PLoadHandler::new())
+    }
+
     fn request_handler(&self) -> Option<RequestHandler> {
         Some(RequestHandler::new(PRequestHandler::new(
             self.adblock_engine.clone(),
         )))
-    }
-
-    fn load_handler(&self) -> Option<LoadHandler> {
-        Some(PLoadHandler::new())
     }
 
     fn on_process_message_received(
@@ -152,5 +148,9 @@ impl ImplClient for PClient {
         }
 
         0
+    }
+
+    fn get_raw(&self) -> *mut cef_dll_sys::_cef_client_t {
+        self.object.cast()
     }
 }
