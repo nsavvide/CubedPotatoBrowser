@@ -11,7 +11,10 @@ use cef::{
     api_hash, args::Args, execute_process, initialize, run_message_loop, shutdown, CefString,
     ImplCommandLine, Window,
 };
-use potato_browser::{browser::launch::spawn_browser_window, handlers::app::PApp, sandbox, utils::adblock::create_adblock_engine};
+use potato_browser::{
+    browser::launch::spawn_browser_window, handlers::app::PApp, sandbox,
+    utils::adblock::create_adblock_engine,
+};
 
 use std::{fs, os::unix::net::UnixListener, path::Path};
 
@@ -32,7 +35,9 @@ fn start_ipc_thread(windows: Arc<Mutex<Vec<Window>>>, adblock_engine: Arc<Mutex<
                     println!("[Server] New client connected");
                     let windows_clone = Arc::clone(&windows);
                     let adblock_engine_clone = Arc::clone(&adblock_engine);
-                    thread::spawn(move || handle_client(stream, windows_clone, adblock_engine_clone));
+                    thread::spawn(move || {
+                        handle_client(stream, windows_clone, adblock_engine_clone)
+                    });
                 }
                 Err(e) => eprintln!("[Server] Connection failed: {}", e),
             }
@@ -40,7 +45,11 @@ fn start_ipc_thread(windows: Arc<Mutex<Vec<Window>>>, adblock_engine: Arc<Mutex<
     });
 }
 
-fn handle_client(stream: UnixStream, windows: Arc<Mutex<Vec<Window>>>, adblock_engine: Arc<Mutex<Engine>>) {
+fn handle_client(
+    stream: UnixStream,
+    windows: Arc<Mutex<Vec<Window>>>,
+    adblock_engine: Arc<Mutex<Engine>>,
+) {
     let reader = BufReader::new(stream);
 
     for line in reader.lines() {
@@ -97,11 +106,8 @@ fn main() {
         1
     );
 
-let adblock_engine = create_adblock_engine();
-
+    let adblock_engine = create_adblock_engine();
     start_ipc_thread(windows.clone(), adblock_engine.clone());
-
     run_message_loop();
-
     shutdown();
 }
