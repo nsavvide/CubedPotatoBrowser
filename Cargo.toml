@@ -9,7 +9,7 @@ repository = "https://github.com/nielssav/potato-browser"
 [dependencies]
 cef = { path = "cef" }
 cef-dll-sys = { path = "sys" }
-adblock = "0.10.1"
+adblock = "0.13.0"
 regex = "1" 
 
 [workspace]
@@ -28,10 +28,10 @@ cef-dll-sys = { version = "137.0.0", path = "sys" }
 download-cef = { version = "1.4", path = "download-cef" }
 
 anyhow = "1"
-bindgen = "0.72"
+bindgen = "0.73"
 clap = { version = "4", features = ["derive"] }
 cmake = "0.1"
-convert_case = "0.8"
+convert_case = "0.12"
 plist = "1"
 proc-macro2 = "1"
 quote = "1"
@@ -43,5 +43,5 @@ syn = { version = "2", features = ["full"] }
 thiserror = "2"
 
 [workspace.dependencies.windows-sys]
-version = "0.60"
+version = "0.61"
 features = ["Win32_System_Environment", "Win32_System_LibraryLoader"]
